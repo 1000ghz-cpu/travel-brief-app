@@ -3,7 +3,9 @@
 
 Reuses the API logic from travelbrief.py. Air quality requires an
 OpenWeatherMap API key in the OPENWEATHER_API_KEY environment variable
-(get one at https://openweathermap.org/api).
+(get one at https://openweathermap.org/api). If an origin city is given,
+the great-circle distance to the destination and a rough estimated fare
+are shown alongside the rest of the brief.
 
 Example usage:
     python3 app.py
@@ -11,14 +13,19 @@ Example usage:
 
     OPENWEATHER_API_KEY=your_key_here python3 app.py
 """
+import math
 import os
 
 import requests
 from flask import Flask, render_template, request
 
-from travelbrief import build_brief
+from travelbrief import build_brief, geocode_city
 
 app = Flask(__name__)
+
+EARTH_RADIUS_KM = 6371.0
+FARE_PER_KM = 0.12
+MINIMUM_FARE = 40.0
 
 # Label (as produced by build_brief) -> icon shown next to it in the result card.
 BRIEF_ICONS = {
@@ -52,6 +59,20 @@ AGE_RECOMMENDATIONS = {
 }
 
 
+def haversine_km(lat1, lon1, lat2, lon2):
+    """Great-circle distance between two lat/lon points, in kilometers."""
+    lat1_rad, lon1_rad, lat2_rad, lon2_rad = (math.radians(v) for v in (lat1, lon1, lat2, lon2))
+    dlat = lat2_rad - lat1_rad
+    dlon = lon2_rad - lon1_rad
+    a = math.sin(dlat / 2) ** 2 + math.cos(lat1_rad) * math.cos(lat2_rad) * math.sin(dlon / 2) ** 2
+    return 2 * EARTH_RADIUS_KM * math.asin(math.sqrt(a))
+
+
+def estimate_fare(distance_km):
+    """Rough distance-based fare estimate — not live pricing."""
+    return max(MINIMUM_FARE, distance_km * FARE_PER_KM)
+
+
 def get_age_recommendation(age):
     """Return the recommendation dict for the age bracket containing `age`, or None."""
     for (low, high), recommendation in AGE_RECOMMENDATIONS.items():
@@ -80,6 +101,7 @@ def index():
 def brief():
     city = request.form.get("city", "").strip()
     age = request.form.get("age", "").strip()
+    origin_city = request.form.get("origin_city", "").strip()
 
     if not city or not age.isdigit():
         return render_template("index.html", error="Please enter a city name and a valid age."), 400
@@ -96,6 +118,27 @@ def brief():
 
     brief_title, brief_rows = parse_brief(result)
     recommendation = get_age_recommendation(int(age))
+
+    if origin_city:
+        try:
+            origin_place = geocode_city(origin_city)
+            destination_place = geocode_city(city)
+        except requests.RequestException as exc:
+            return render_template("index.html", error=f"Network error while calculating distance: {exc}"), 502
+
+        if origin_place is None:
+            return render_template("index.html", error=f"Could not find a city named '{origin_city}'."), 404
+
+        distance_km = haversine_km(
+            origin_place["latitude"], origin_place["longitude"],
+            destination_place["latitude"], destination_place["longitude"],
+        )
+        brief_rows.append({"icon": "📏", "label": "Distance from origin", "value": f"{distance_km:.0f} km"})
+        brief_rows.append({
+            "icon": "💵",
+            "label": "Estimated fare — rough approximation, not live pricing",
+            "value": f"${estimate_fare(distance_km):.2f}",
+        })
 
     return render_template(
         "result.html",

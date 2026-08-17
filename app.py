@@ -14,11 +14,22 @@ Example usage:
 import os
 
 import requests
-from flask import Flask, render_template_string, request
+from flask import Flask, render_template, request
 
 from travelbrief import build_brief
 
 app = Flask(__name__)
+
+# Label (as produced by build_brief) -> icon shown next to it in the result card.
+BRIEF_ICONS = {
+    "Location": "📍",
+    "Weather": "🌤️",
+    "Temperature": "🌡️",
+    "Wind speed": "💨",
+    "Exchange rate": "💱",
+    "Air quality": "🌬️",
+}
+DEFAULT_BRIEF_ICON = "•"
 
 # Age bracket -> (min, max) inclusive; max of None means no upper bound.
 AGE_RECOMMENDATIONS = {
@@ -49,51 +60,20 @@ def get_age_recommendation(age):
     return None
 
 
-FORM_TEMPLATE = """
-<!doctype html>
-<html>
-<head><title>Travel Brief</title></head>
-<body>
-<h1>Travel Brief</h1>
-<form method="post" action="/brief">
-  <label for="city">City name:</label>
-  <input type="text" id="city" name="city" required>
-  <br><br>
-  <label for="age">Age:</label>
-  <input type="number" id="age" name="age" min="0" required>
-  <br><br>
-  <button type="submit">Get brief</button>
-</form>
-{% if error %}<p style="color: red;">{{ error }}</p>{% endif %}
-</body>
-</html>
-"""
-
-RESULT_TEMPLATE = """
-<!doctype html>
-<html>
-<head><title>Travel Brief for {{ city }}</title></head>
-<body>
-<h1>Travel Brief for {{ city }} (age {{ age }})</h1>
-<pre>{{ brief }}</pre>
-{% if recommendation %}
-<h2>Travel style for your age</h2>
-<p>{{ recommendation.style }}</p>
-<ul>
-{% for activity in recommendation.activities %}
-  <li>{{ activity }}</li>
-{% endfor %}
-</ul>
-{% endif %}
-<p><a href="/">Back</a></p>
-</body>
-</html>
-"""
+def parse_brief(brief_text):
+    """Split build_brief's "Title\\n----\\nLabel: value\\n..." text into a title and rows."""
+    lines = brief_text.splitlines()
+    title = lines[0]
+    rows = []
+    for line in lines[2:]:
+        label, _, value = line.partition(": ")
+        rows.append({"icon": BRIEF_ICONS.get(label, DEFAULT_BRIEF_ICON), "label": label, "value": value})
+    return title, rows
 
 
 @app.route("/", methods=["GET"])
 def index():
-    return render_template_string(FORM_TEMPLATE, error=None)
+    return render_template("index.html", error=None)
 
 
 @app.route("/brief", methods=["POST"])
@@ -102,22 +82,28 @@ def brief():
     age = request.form.get("age", "").strip()
 
     if not city or not age.isdigit():
-        return render_template_string(FORM_TEMPLATE, error="Please enter a city name and a valid age."), 400
+        return render_template("index.html", error="Please enter a city name and a valid age."), 400
 
     openweather_api_key = os.environ.get("OPENWEATHER_API_KEY")
 
     try:
         result = build_brief(city, openweather_api_key)
     except requests.RequestException as exc:
-        return render_template_string(FORM_TEMPLATE, error=f"Network error while fetching travel brief: {exc}"), 502
+        return render_template("index.html", error=f"Network error while fetching travel brief: {exc}"), 502
 
     if result is None:
-        return render_template_string(FORM_TEMPLATE, error=f"Could not find a city named '{city}'."), 404
+        return render_template("index.html", error=f"Could not find a city named '{city}'."), 404
 
+    brief_title, brief_rows = parse_brief(result)
     recommendation = get_age_recommendation(int(age))
 
-    return render_template_string(
-        RESULT_TEMPLATE, city=city, age=age, brief=result, recommendation=recommendation
+    return render_template(
+        "result.html",
+        city=city,
+        age=age,
+        brief_title=brief_title,
+        brief_rows=brief_rows,
+        recommendation=recommendation,
     )
 
 

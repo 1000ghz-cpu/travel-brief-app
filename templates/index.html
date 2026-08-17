@@ -1,0 +1,34 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Travel Brief</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+  <main class="page page-narrow">
+    <div class="card form-card">
+      <p class="eyebrow">✈️ Travel Brief</p>
+      <h1>Plan your next trip</h1>
+      <p class="subtitle">Weather, currency, and air quality for any city — tailored to your age.</p>
+
+      {% if error %}
+        <div class="alert">{{ error }}</div>
+      {% endif %}
+
+      <form method="post" action="/brief" class="form">
+        <div class="field">
+          <label for="city">City name</label>
+          <input type="text" id="city" name="city" placeholder="e.g. Tokyo" required>
+        </div>
+        <div class="field">
+          <label for="age">Age</label>
+          <input type="number" id="age" name="age" min="0" placeholder="e.g. 29" required>
+        </div>
+        <button type="submit">Get my brief</button>
+      </form>
+    </div>
+  </main>
+</body>
+</html>

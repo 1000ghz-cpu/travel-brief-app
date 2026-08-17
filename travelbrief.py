@@ -1,11 +1,16 @@
 #!/usr/bin/env python3
-"""Command-line travel briefing: weather + USD exchange rate for a city.
+"""Command-line travel briefing: weather + USD exchange rate + air quality for a city.
+
+Air quality requires an OpenWeatherMap API key in the OPENWEATHER_API_KEY
+environment variable (get one at https://openweathermap.org/api).
 
 Example usage:
     python3 travelbrief.py Tokyo
     python3 travelbrief.py "New York"
+    OPENWEATHER_API_KEY=your_key_here python3 travelbrief.py Tokyo
 """
 import argparse
+import os
 import sys
 
 import requests
@@ -13,6 +18,7 @@ import requests
 GEOCODING_URL = "https://geocoding-api.open-meteo.com/v1/search"
 FORECAST_URL = "https://api.open-meteo.com/v1/forecast"
 EXCHANGE_URL = "https://api.frankfurter.dev/v1/latest"
+AIR_POLLUTION_URL = "https://api.openweathermap.org/data/2.5/air_pollution"
 
 WMO_WEATHER_CODES = {
     0: "Clear sky",
@@ -69,6 +75,14 @@ COUNTRY_TO_CURRENCY = {
 
 WMO_UNKNOWN_CODE_DESC = "Unknown conditions"
 
+AQI_LABELS = {
+    1: "Good",
+    2: "Fair",
+    3: "Moderate",
+    4: "Poor",
+    5: "Very Poor",
+}
+
 
 def geocode_city(city):
     response = requests.get(GEOCODING_URL, params={"name": city, "count": 1}, timeout=10)
@@ -101,7 +115,17 @@ def get_exchange_rate(currency_code):
     return rates.get(currency_code)
 
 
-def build_brief(city_name):
+def get_air_quality(latitude, longitude, api_key):
+    params = {"lat": latitude, "lon": longitude, "appid": api_key}
+    response = requests.get(AIR_POLLUTION_URL, params=params, timeout=10)
+    response.raise_for_status()
+    items = response.json().get("list", [])
+    if not items:
+        return None
+    return items[0].get("main", {}).get("aqi")
+
+
+def build_brief(city_name, openweather_api_key=None):
     place = geocode_city(city_name)
     if place is None:
         return None
@@ -119,6 +143,8 @@ def build_brief(city_name):
     currency_code = COUNTRY_TO_CURRENCY.get(country_code)
     exchange_rate = get_exchange_rate(currency_code) if currency_code else None
 
+    aqi = get_air_quality(latitude, longitude, openweather_api_key) if openweather_api_key else None
+
     lines = [
         f"Travel Brief: {place['name']}, {country}",
         "-" * 40,
@@ -135,6 +161,10 @@ def build_brief(city_name):
     else:
         lines.append("Exchange rate: unknown currency for this country")
 
+    if openweather_api_key:
+        aqi_label = AQI_LABELS.get(aqi, "Unknown")
+        lines.append(f"Air quality: {aqi_label}")
+
     return "\n".join(lines)
 
 
@@ -143,8 +173,17 @@ def main():
     parser.add_argument("city", help="City name, e.g. 'Tokyo' or 'New York'")
     args = parser.parse_args()
 
+    openweather_api_key = os.environ.get("OPENWEATHER_API_KEY")
+    if not openweather_api_key:
+        print(
+            "Warning: OPENWEATHER_API_KEY environment variable is not set — "
+            "skipping air quality. Set it (get a key at "
+            "https://openweathermap.org/api) to include air quality in the brief.",
+            file=sys.stderr,
+        )
+
     try:
-        brief = build_brief(args.city)
+        brief = build_brief(args.city, openweather_api_key)
     except requests.RequestException as exc:
         print(f"Network error while fetching travel brief: {exc}", file=sys.stderr)
         sys.exit(1)

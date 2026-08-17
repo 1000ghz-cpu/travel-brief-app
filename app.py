@@ -7,7 +7,7 @@ OpenWeatherMap API key in the OPENWEATHER_API_KEY environment variable
 
 Example usage:
     python3 app.py
-    # then open http://127.0.0.1:5000 in a browser
+    # then open http://127.0.0.1:5001 in a browser
 
     OPENWEATHER_API_KEY=your_key_here python3 app.py
 """
@@ -19,6 +19,35 @@ from flask import Flask, render_template_string, request
 from travelbrief import build_brief
 
 app = Flask(__name__)
+
+# Age bracket -> (min, max) inclusive; max of None means no upper bound.
+AGE_RECOMMENDATIONS = {
+    (18, 25): {
+        "style": "Budget-friendly adventure and social travel",
+        "activities": ["music festivals", "hostels", "nightlife", "backpacking"],
+    },
+    (26, 40): {
+        "style": "Active, experience-driven travel",
+        "activities": ["food tours", "hiking", "boutique hotels", "local nightlife"],
+    },
+    (41, 60): {
+        "style": "Comfort-focused cultural travel",
+        "activities": ["monuments", "museums", "wine tasting", "mid-range hotels"],
+    },
+    (61, None): {
+        "style": "Relaxed, low-strain sightseeing",
+        "activities": ["guided tours", "monuments", "relaxed sightseeing", "cruises"],
+    },
+}
+
+
+def get_age_recommendation(age):
+    """Return the recommendation dict for the age bracket containing `age`, or None."""
+    for (low, high), recommendation in AGE_RECOMMENDATIONS.items():
+        if age >= low and (high is None or age <= high):
+            return recommendation
+    return None
+
 
 FORM_TEMPLATE = """
 <!doctype html>
@@ -47,6 +76,15 @@ RESULT_TEMPLATE = """
 <body>
 <h1>Travel Brief for {{ city }} (age {{ age }})</h1>
 <pre>{{ brief }}</pre>
+{% if recommendation %}
+<h2>Travel style for your age</h2>
+<p>{{ recommendation.style }}</p>
+<ul>
+{% for activity in recommendation.activities %}
+  <li>{{ activity }}</li>
+{% endfor %}
+</ul>
+{% endif %}
 <p><a href="/">Back</a></p>
 </body>
 </html>
@@ -76,8 +114,12 @@ def brief():
     if result is None:
         return render_template_string(FORM_TEMPLATE, error=f"Could not find a city named '{city}'."), 404
 
-    return render_template_string(RESULT_TEMPLATE, city=city, age=age, brief=result)
+    recommendation = get_age_recommendation(int(age))
+
+    return render_template_string(
+        RESULT_TEMPLATE, city=city, age=age, brief=result, recommendation=recommendation
+    )
 
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    app.run(debug=True, port=5001)

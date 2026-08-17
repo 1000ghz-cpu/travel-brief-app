@@ -19,6 +19,16 @@ def list_tasks():
     return sorted(tasks, key=lambda task: PRIORITY_ORDER.get(task.get("priority", "medium"), 1))
 
 
+def edit_task(task_id, description):
+    tasks = load_tasks()
+    for task in tasks:
+        if task["id"] == task_id:
+            task["description"] = description
+            save_tasks(tasks)
+            return True
+    return False
+
+
 def mark_done(task_id):
     tasks = load_tasks()
     for task in tasks:

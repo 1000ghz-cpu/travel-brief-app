@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 import argparse
 
-from todo.tasks import PRIORITIES, add_task, delete_task, list_tasks, mark_done
+from todo.tasks import PRIORITIES, add_task, delete_task, edit_task, list_tasks, mark_done
 
 
 def cmd_add(args):
@@ -23,6 +23,13 @@ def cmd_list(args):
 def cmd_done(args):
     if mark_done(args.id):
         print(f"Marked task {args.id} as done.")
+    else:
+        print(f"No task found with id {args.id}.")
+
+
+def cmd_edit(args):
+    if edit_task(args.id, args.description):
+        print(f"Updated task {args.id}: {args.description}")
     else:
         print(f"No task found with id {args.id}.")
 
@@ -51,6 +58,11 @@ def main():
     done_parser = subparsers.add_parser("done", help="Mark a task as done")
     done_parser.add_argument("id", type=int, help="Task id")
     done_parser.set_defaults(func=cmd_done)
+
+    edit_parser = subparsers.add_parser("edit", help="Edit an existing task's name")
+    edit_parser.add_argument("id", type=int, help="Task id")
+    edit_parser.add_argument("description", help="New task description")
+    edit_parser.set_defaults(func=cmd_edit)
 
     delete_parser = subparsers.add_parser("delete", help="Delete a task")
     delete_parser.add_argument("id", type=int, help="Task id")

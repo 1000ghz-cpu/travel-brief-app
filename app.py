@@ -98,7 +98,7 @@ def haversine_km(lat1, lon1, lat2, lon2):
 
 def estimate_fare(distance_km):
     """Rough distance-based fare estimate — not live pricing."""
-    return max(MINIMUM_FARE, distance_km + FARE_PER_KM)
+    return max(MINIMUM_FARE, distance_km * FARE_PER_KM)
 
 
 def get_age_bracket(age):

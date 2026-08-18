@@ -7,6 +7,10 @@ import requests
 
 from travelbrief import build_brief
 
+# haversine_km/estimate_fare are defined in app.py (which builds on travelbrief.py's
+# geocoding/brief functions), not in travelbrief.py itself.
+from app import FARE_PER_KM, MINIMUM_FARE, estimate_fare, haversine_km
+
 GEOCODE_RESULT = {
     "results": [
         {
@@ -88,6 +92,57 @@ class BuildBriefTests(unittest.TestCase):
 
         self.assertIn("Tokyo, Japan", brief)
         self.assertIn("Air quality: Unknown", brief)
+
+
+class HaversineKmTests(unittest.TestCase):
+    def test_new_york_to_london_matches_known_distance(self):
+        # Real-world great-circle distance is ~5570 km.
+        distance = haversine_km(40.7128, -74.0060, 51.5074, -0.1278)
+
+        self.assertAlmostEqual(distance, 5570, delta=20)
+
+    def test_paris_to_london_matches_known_distance(self):
+        # Real-world great-circle distance is ~344 km.
+        distance = haversine_km(48.8566, 2.3522, 51.5074, -0.1278)
+
+        self.assertAlmostEqual(distance, 344, delta=10)
+
+    def test_tokyo_to_sydney_matches_known_distance(self):
+        # Real-world great-circle distance is ~7823 km.
+        distance = haversine_km(35.6762, 139.6503, -33.8688, 151.2093)
+
+        self.assertAlmostEqual(distance, 7823, delta=30)
+
+    def test_identical_origin_and_destination_is_zero(self):
+        distance = haversine_km(35.6895, 139.6917, 35.6895, 139.6917)
+
+        self.assertEqual(distance, 0.0)
+
+    def test_distance_is_symmetric(self):
+        forward = haversine_km(40.7128, -74.0060, 51.5074, -0.1278)
+        backward = haversine_km(51.5074, -0.1278, 40.7128, -74.0060)
+
+        self.assertAlmostEqual(forward, backward, places=9)
+
+
+class EstimateFareTests(unittest.TestCase):
+    def test_zero_distance_returns_minimum_fare(self):
+        self.assertEqual(estimate_fare(0), MINIMUM_FARE)
+
+    def test_short_distance_below_minimum_returns_minimum_fare(self):
+        # At FARE_PER_KM=0.12 and MINIMUM_FARE=40.0, distances under ~333 km
+        # would otherwise price below the minimum fare.
+        short_distance = 50.0
+
+        self.assertEqual(estimate_fare(short_distance), MINIMUM_FARE)
+
+    def test_long_distance_scales_linearly_with_distance(self):
+        distance = 5570.2  # New York -> London
+
+        fare = estimate_fare(distance)
+
+        self.assertAlmostEqual(fare, distance * FARE_PER_KM, places=6)
+        self.assertGreater(fare, MINIMUM_FARE)
 
 
 if __name__ == "__main__":

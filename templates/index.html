@@ -11,26 +11,26 @@
     <div class="card form-card">
       <p class="eyebrow">✈️ Travel Brief</p>
       <h1>Plan your next trip</h1>
-      <p class="subtitle">Weather, currency, and air quality for any city — tailored to your age.</p>
+      <p class="subtitle">Tell us about yourself, then explore destinations on the map.</p>
 
       {% if error %}
         <div class="alert">{{ error }}</div>
       {% endif %}
 
-      <form method="post" action="/brief" class="form">
+      <form method="post" action="/" class="form">
         <div class="field">
-          <label for="city">City name</label>
-          <input type="text" id="city" name="city" placeholder="e.g. Tokyo" required>
+          <label for="name">Your name</label>
+          <input type="text" id="name" name="name" placeholder="e.g. Priya" required>
         </div>
         <div class="field">
           <label for="age">Age</label>
           <input type="number" id="age" name="age" min="0" placeholder="e.g. 29" required>
         </div>
         <div class="field">
-          <label for="origin_city">Origin city (optional, for distance/fare estimate)</label>
-          <input type="text" id="origin_city" name="origin_city" placeholder="e.g. Mumbai">
+          <label for="home_location">Home location (city)</label>
+          <input type="text" id="home_location" name="home_location" placeholder="e.g. Mumbai" required>
         </div>
-        <button type="submit">Get my brief</button>
+        <button type="submit">Explore destinations</button>
       </form>
     </div>
   </main>

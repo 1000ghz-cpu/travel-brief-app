@@ -106,10 +106,10 @@ def get_current_weather(latitude, longitude, timezone):
     return response.json().get("current", {})
 
 
-def get_exchange_rate(currency_code):
-    if currency_code == "USD":
+def get_exchange_rate(currency_code, base_currency="USD"):
+    if currency_code == base_currency:
         return 1.0
-    response = requests.get(EXCHANGE_URL, params={"base": "USD", "symbols": currency_code}, timeout=10)
+    response = requests.get(EXCHANGE_URL, params={"from": base_currency, "to": currency_code}, timeout=10)
     response.raise_for_status()
     rates = response.json().get("rates", {})
     return rates.get(currency_code)
@@ -125,7 +125,7 @@ def get_air_quality(latitude, longitude, api_key):
     return items[0].get("main", {}).get("aqi")
 
 
-def build_brief(city_name, openweather_api_key=None):
+def build_brief(city_name, openweather_api_key=None, base_currency="USD"):
     place = geocode_city(city_name)
     if place is None:
         return None
@@ -141,9 +141,19 @@ def build_brief(city_name, openweather_api_key=None):
     weather_desc = WMO_WEATHER_CODES.get(weather_code, WMO_UNKNOWN_CODE_DESC)
 
     currency_code = COUNTRY_TO_CURRENCY.get(country_code)
-    exchange_rate = get_exchange_rate(currency_code) if currency_code else None
+    exchange_rate = None
+    if currency_code and base_currency:
+        try:
+            exchange_rate = get_exchange_rate(currency_code, base_currency=base_currency)
+        except requests.RequestException:
+            exchange_rate = None
 
-    aqi = get_air_quality(latitude, longitude, openweather_api_key) if openweather_api_key else None
+    aqi = None
+    if openweather_api_key:
+        try:
+            aqi = get_air_quality(latitude, longitude, openweather_api_key)
+        except requests.RequestException:
+            aqi = None
 
     lines = [
         f"Travel Brief: {place['name']}, {country}",
@@ -154,8 +164,10 @@ def build_brief(city_name, openweather_api_key=None):
         f"Wind speed: {weather.get('wind_speed_10m', 'N/A')} km/h",
     ]
 
-    if currency_code and exchange_rate is not None:
-        lines.append(f"Exchange rate: 1 USD = {exchange_rate:.2f} {currency_code}")
+    if not base_currency:
+        lines.append("Exchange rate: unknown currency for your home location")
+    elif currency_code and exchange_rate is not None:
+        lines.append(f"Exchange rate: 1 {base_currency} = {exchange_rate:.2f} {currency_code}")
     elif currency_code:
         lines.append(f"Exchange rate: unavailable for {currency_code}")
     else:

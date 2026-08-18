@@ -1,0 +1,290 @@
+{
+  "Tokyo": {
+    "18-25": {
+      "style": "Neon nights and budget eats",
+      "venues": ["Shibuya nightlife district", "Capsule hostels in Shinjuku", "Harajuku street food alley", "Akihabara arcades"]
+    },
+    "26-40": {
+      "style": "Food-forward city exploring",
+      "venues": ["Tsukiji Outer Market food tour", "Golden Gai bar hopping", "TeamLab digital art museum", "Ramen crawl in Shinjuku"]
+    },
+    "41-60": {
+      "style": "Culture and craft, comfortably paced",
+      "venues": ["Meiji Shrine and gardens", "Sumida Hokusai Museum", "Tea ceremony experience", "Ginza boutique shopping"]
+    },
+    "60+": {
+      "style": "Relaxed heritage sightseeing",
+      "venues": ["Guided Asakusa temple tour", "Hamarikyu Gardens stroll", "Shinkansen day trip to Kamakura", "Traditional ryokan stay"]
+    }
+  },
+  "Bangkok": {
+    "18-25": {
+      "style": "Street food and buzzing nightlife",
+      "venues": ["Khao San Road nightlife", "Chatuchak weekend market", "Rooftop bars in Sukhumvit", "Muay Thai stadium night"]
+    },
+    "26-40": {
+      "style": "Markets, temples, and river life",
+      "venues": ["Chao Phraya river dinner cruise", "Chinatown food crawl", "Floating market day trip", "Cooking class in Silom"]
+    },
+    "41-60": {
+      "style": "Temples and spa-focused culture",
+      "venues": ["Wat Arun and Grand Palace tour", "Traditional Thai massage spa", "Jim Thompson House", "Riverside fine dining"]
+    },
+    "60+": {
+      "style": "Comfortable cultural immersion",
+      "venues": ["Guided Grand Palace tour", "Ayutthaya day excursion", "Riverside hotel afternoon tea", "Wat Pho reclining Buddha"]
+    }
+  },
+  "Bali": {
+    "18-25": {
+      "style": "Surf, sun, and social hostels",
+      "venues": ["Canggu surf lessons", "Beach club sunset parties", "Kuta hostel scene", "Uluwatu cliff bars"]
+    },
+    "26-40": {
+      "style": "Wellness meets adventure",
+      "venues": ["Ubud yoga retreat", "Tegallalang rice terrace hike", "Waterfall chasing tour", "Seminyak boutique dining"]
+    },
+    "41-60": {
+      "style": "Serene culture and comfort",
+      "venues": ["Tirta Empul water temple", "Private villa spa day", "Balinese cooking class", "Ubud art market"]
+    },
+    "60+": {
+      "style": "Slow travel among gardens and temples",
+      "venues": ["Guided temple and palace tour", "Botanic garden visit", "Resort spa and pool day", "Scenic countryside drive"]
+    }
+  },
+  "Dubai": {
+    "18-25": {
+      "style": "High-energy desert and skyline thrills",
+      "venues": ["Desert dune bashing safari", "Skydive over Palm Jumeirah", "Beach clubs on JBR", "Global Village nightlife"]
+    },
+    "26-40": {
+      "style": "Luxury adventure and skyline views",
+      "venues": ["Burj Khalifa observation deck", "Desert safari with dinner", "Dubai Marina yacht cruise", "Souk shopping in Deira"]
+    },
+    "41-60": {
+      "style": "Upscale sightseeing and shopping",
+      "venues": ["Dubai Mall and aquarium", "Gold and Spice Souk tour", "Fine dining at Burj Al Arab", "Jumeirah Mosque visit"]
+    },
+    "60+": {
+      "style": "Comfortable landmark touring",
+      "venues": ["Guided city sightseeing tour", "Dubai Fountain evening show", "Museum of the Future", "Resort beachfront relaxation"]
+    }
+  },
+  "Singapore": {
+    "18-25": {
+      "style": "Hawker food and rooftop nightlife",
+      "venues": ["Clarke Quay nightlife", "Hawker center food crawl", "Sentosa beach clubs", "Haji Lane shopping"]
+    },
+    "26-40": {
+      "style": "Food, gardens, and skyline views",
+      "venues": ["Gardens by the Bay light show", "Marina Bay Sands SkyPark", "Tiong Bahru cafe hopping", "Night Safari at the zoo"]
+    },
+    "41-60": {
+      "style": "Cultural districts and fine dining",
+      "venues": ["Peranakan heritage trail in Katong", "Michelin-starred hawker stalls", "Singapore Botanic Gardens", "Chinatown temple tour"]
+    },
+    "60+": {
+      "style": "Comfortable gardens and museums",
+      "venues": ["Gardens by the Bay guided tour", "National Museum of Singapore", "Riverside dinner cruise", "Orchard Road leisurely shopping"]
+    }
+  },
+  "Paris": {
+    "18-25": {
+      "style": "Budget culture and nightlife",
+      "venues": ["Montmartre nightlife", "Free museum days at the Louvre", "Seine riverbank picnics", "Le Marais hostel district"]
+    },
+    "26-40": {
+      "style": "Cafes, art, and boutique charm",
+      "venues": ["Musee d'Orsay art tour", "Le Marais boutique cafes", "Seine sunset cruise", "Canal Saint-Martin bars"]
+    },
+    "41-60": {
+      "style": "Classic culture and cuisine",
+      "venues": ["Louvre guided tour", "Wine tasting in Saint-Germain", "Versailles day trip", "Fine dining bistro crawl"]
+    },
+    "60+": {
+      "style": "Relaxed landmarks and gardens",
+      "venues": ["Guided Louvre and Orsay tour", "Luxembourg Gardens stroll", "Seine river dinner cruise", "Champs-Elysees leisurely walk"]
+    }
+  },
+  "London": {
+    "18-25": {
+      "style": "Pubs, markets, and live music",
+      "venues": ["Camden Market and nightlife", "Shoreditch pub crawl", "Free entry to the British Museum", "Live gigs in Brixton"]
+    },
+    "26-40": {
+      "style": "West End culture and craft pubs",
+      "venues": ["West End theatre show", "Borough Market food tour", "Tate Modern exhibits", "Craft beer in Shoreditch"]
+    },
+    "41-60": {
+      "style": "History and refined dining",
+      "venues": ["Tower of London tour", "Afternoon tea in Mayfair", "National Gallery visit", "Thames river dinner cruise"]
+    },
+    "60+": {
+      "style": "Comfortable heritage sightseeing",
+      "venues": ["Guided Westminster tour", "Kew Gardens visit", "Afternoon tea at a historic hotel", "Thames river cruise"]
+    }
+  },
+  "Rome": {
+    "18-25": {
+      "style": "Ruins by day, trattorias by night",
+      "venues": ["Trastevere nightlife", "Colosseum underground tour", "Campo de' Fiori street food", "Hostel rooftop bars"]
+    },
+    "26-40": {
+      "style": "Ancient history and local cuisine",
+      "venues": ["Colosseum and Roman Forum tour", "Trastevere food crawl", "Vatican Museums visit", "Aperitivo in Monti"]
+    },
+    "41-60": {
+      "style": "Art, history, and fine dining",
+      "venues": ["Vatican and Sistine Chapel tour", "Borghese Gallery visit", "Wine tasting near Piazza Navona", "Classic trattoria dinner"]
+    },
+    "60+": {
+      "style": "Relaxed ancient wonders",
+      "venues": ["Guided Colosseum tour", "Vatican Museums with skip-the-line access", "Piazza Navona leisurely walk", "Traditional Roman lunch"]
+    }
+  },
+  "Barcelona": {
+    "18-25": {
+      "style": "Beach clubs and Gaudi by day",
+      "venues": ["Barceloneta beach clubs", "Park Guell exploring", "El Raval hostel nightlife", "Tapas crawl in Gothic Quarter"]
+    },
+    "26-40": {
+      "style": "Architecture, tapas, and nightlife",
+      "venues": ["Sagrada Familia guided tour", "Tapas crawl in El Born", "Bunkers del Carmel sunset view", "Poble Sec cocktail bars"]
+    },
+    "41-60": {
+      "style": "Art, architecture, and wine",
+      "venues": ["Gaudi architecture tour", "Boqueria Market food tasting", "Wine tasting in Gothic Quarter", "Picasso Museum visit"]
+    },
+    "60+": {
+      "style": "Relaxed architectural sightseeing",
+      "venues": ["Guided Sagrada Familia tour", "Park Guell leisurely visit", "Las Ramblas walking tour", "Seafront promenade stroll"]
+    }
+  },
+  "Amsterdam": {
+    "18-25": {
+      "style": "Canals, bikes, and nightlife",
+      "venues": ["Canal-side bar hopping", "Bike tour of the city", "Vondelpark picnics", "Red Light District nightlife"]
+    },
+    "26-40": {
+      "style": "Museums and canal-side cafes",
+      "venues": ["Van Gogh Museum visit", "Canal boat cruise", "Jordaan cafe hopping", "Brewery tour"]
+    },
+    "41-60": {
+      "style": "Art, history, and scenic canals",
+      "venues": ["Rijksmuseum guided tour", "Anne Frank House visit", "Canal cruise with dinner", "Flower market stroll"]
+    },
+    "60+": {
+      "style": "Comfortable canal-side culture",
+      "venues": ["Guided canal boat tour", "Rijksmuseum visit", "Vondelpark leisurely walk", "Windmill day trip to Zaanse Schans"]
+    }
+  },
+  "New York": {
+    "18-25": {
+      "style": "Iconic sights and nightlife on a budget",
+      "venues": ["Brooklyn nightlife", "Times Square and free Staten Island ferry", "Rooftop bars in Manhattan", "Street food carts"]
+    },
+    "26-40": {
+      "style": "Culture, food, and skyline views",
+      "venues": ["High Line and Chelsea Market", "Broadway show", "Rooftop bar at sunset", "Brooklyn food crawl"]
+    },
+    "41-60": {
+      "style": "Museums and refined dining",
+      "venues": ["Metropolitan Museum of Art", "Central Park guided walk", "Fine dining in the West Village", "Broadway matinee"]
+    },
+    "60+": {
+      "style": "Comfortable landmark touring",
+      "venues": ["Guided Central Park tour", "Museum of Modern Art visit", "Statue of Liberty cruise", "Classic Broadway show"]
+    }
+  },
+  "Cancun": {
+    "18-25": {
+      "style": "Beach parties and all-night energy",
+      "venues": ["Hotel Zone beach clubs", "Isla Mujeres party boat", "Cenote swimming tour", "Downtown nightlife"]
+    },
+    "26-40": {
+      "style": "Beaches, reefs, and ruins",
+      "venues": ["Snorkeling at Chichen Itza cenotes", "Catamaran reef tour", "Beachfront dinner", "Tulum day trip"]
+    },
+    "41-60": {
+      "style": "Relaxed beach and cultural mix",
+      "venues": ["Chichen Itza guided tour", "Spa day at a beach resort", "Sunset catamaran cruise", "Mayan cultural museum"]
+    },
+    "60+": {
+      "style": "Comfortable resort and heritage days",
+      "venues": ["Guided Mayan ruins tour", "Resort beachfront relaxation", "Scenic lagoon boat ride", "Local market shopping"]
+    }
+  },
+  "Rio de Janeiro": {
+    "18-25": {
+      "style": "Beaches, samba, and nightlife",
+      "venues": ["Copacabana beach volleyball", "Lapa samba nightlife", "Ipanema beach clubs", "Hostel rooftop parties"]
+    },
+    "26-40": {
+      "style": "Beaches, hikes, and vibrant culture",
+      "venues": ["Sugarloaf Mountain cable car", "Trail hike to Dois Irmaos", "Ipanema beach day", "Samba club night in Lapa"]
+    },
+    "41-60": {
+      "style": "Scenic landmarks and local cuisine",
+      "venues": ["Christ the Redeemer guided tour", "Santa Teresa neighborhood walk", "Botanical Garden visit", "Feijoada lunch tasting"]
+    },
+    "60+": {
+      "style": "Relaxed scenic sightseeing",
+      "venues": ["Guided Christ the Redeemer tour", "Sugarloaf cable car at sunset", "Botanical Garden stroll", "Copacabana beachfront promenade"]
+    }
+  },
+  "Cape Town": {
+    "18-25": {
+      "style": "Adventure, beaches, and nightlife",
+      "venues": ["Table Mountain hike", "Long Street nightlife", "Camps Bay beach day", "Shark cage diving"]
+    },
+    "26-40": {
+      "style": "Adventure and wine country",
+      "venues": ["Table Mountain cable car", "Cape Winelands tour", "Boulders Beach penguins", "Bo-Kaap food and culture walk"]
+    },
+    "41-60": {
+      "style": "Scenic drives and wine tasting",
+      "venues": ["Cape Point scenic drive", "Stellenbosch wine tasting", "Kirstenbosch Botanical Garden", "V&A Waterfront dining"]
+    },
+    "60+": {
+      "style": "Relaxed scenery and heritage",
+      "venues": ["Guided Cape Peninsula tour", "Kirstenbosch Garden visit", "Waterfront harbor stroll", "Winelands lunch tour"]
+    }
+  },
+  "Sydney": {
+    "18-25": {
+      "style": "Beaches, surf, and nightlife",
+      "venues": ["Bondi Beach surf lessons", "Coogee to Bondi coastal walk", "Darling Harbour nightlife", "Hostel beach parties"]
+    },
+    "26-40": {
+      "style": "Harbour views and coastal adventure",
+      "venues": ["Sydney Harbour Bridge climb", "Bondi to Coogee walk", "Opera House show", "Manly Beach ferry day"]
+    },
+    "41-60": {
+      "style": "Harbour culture and scenic dining",
+      "venues": ["Sydney Opera House guided tour", "Harbour dinner cruise", "Royal Botanic Garden visit", "Blue Mountains day trip"]
+    },
+    "60+": {
+      "style": "Relaxed harbourside sightseeing",
+      "venues": ["Guided Opera House tour", "Botanic Garden leisurely walk", "Harbour lunch cruise", "Manly ferry scenic ride"]
+    }
+  },
+  "Istanbul": {
+    "18-25": {
+      "style": "Bazaars and Bosphorus nightlife",
+      "venues": ["Grand Bazaar shopping", "Rooftop bars in Beyoglu", "Bosphorus ferry hangouts", "Karakoy hostel nightlife"]
+    },
+    "26-40": {
+      "style": "History, food, and Bosphorus views",
+      "venues": ["Hagia Sophia and Blue Mosque tour", "Spice Bazaar food crawl", "Bosphorus sunset cruise", "Karakoy cafe hopping"]
+    },
+    "41-60": {
+      "style": "Ottoman history and fine dining",
+      "venues": ["Topkapi Palace guided tour", "Turkish bath (hamam) experience", "Bosphorus dinner cruise", "Grand Bazaar carpet shopping"]
+    },
+    "60+": {
+      "style": "Relaxed historic sightseeing",
+      "venues": ["Guided Hagia Sophia and Topkapi tour", "Bosphorus leisurely cruise", "Turkish tea in Sultanahmet", "Grand Bazaar guided walk"]
+    }
+  }
+}

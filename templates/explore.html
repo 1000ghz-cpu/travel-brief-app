@@ -1,0 +1,111 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Explore Destinations</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+        integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="">
+</head>
+<body>
+  <main class="page">
+    <div class="page-header">
+      <a href="/" class="back-link">&larr; Back</a>
+      <h1>Hi {{ name }} <span class="age-badge">age {{ age }}</span></h1>
+      <p class="subtitle">Traveling from {{ home_location }}. Click a marker to see the details.</p>
+    </div>
+
+    <div class="card">
+      <div id="map"></div>
+      <p class="map-hint">Click a city marker for weather, currency, air quality, distance, and recommendations.</p>
+    </div>
+
+    <div class="card" id="details-panel">
+      <p class="details-empty">Click a city on the map to see its travel brief.</p>
+    </div>
+  </main>
+
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+          integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+  <script>
+    const CITIES = {{ cities | tojson }};
+
+    const map = L.map("map", { worldCopyJump: true }).setView([20, 10], 2);
+    L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+      maxZoom: 18,
+      attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+    }).addTo(map);
+
+    const detailsPanel = document.getElementById("details-panel");
+
+    function renderLoading(cityName) {
+      detailsPanel.innerHTML = `<p class="details-empty">Loading ${cityName}&hellip;</p>`;
+    }
+
+    function renderError(message) {
+      detailsPanel.innerHTML = `<div class="alert">${message}</div>`;
+    }
+
+    function renderCityData(data) {
+      const briefRows = data.brief_rows.map((row) => `
+        <div class="brief-row">
+          <dt><span class="icon" aria-hidden="true">${row.icon}</span>${row.label}</dt>
+          <dd>${row.value}</dd>
+        </div>
+      `).join("");
+
+      const blurbHtml = data.city_blurb
+        ? `<p class="city-blurb">${data.city_blurb}</p>`
+        : "";
+
+      let recommendationHtml = "";
+      if (data.recommendation) {
+        const venues = data.recommendation.venues.map((venue) => `
+          <li class="venue-card">
+            ${venue.thumbnail
+              ? `<img class="venue-thumb" src="${venue.thumbnail}" alt="${venue.name}" loading="lazy">`
+              : `<div class="venue-thumb venue-thumb-placeholder" aria-hidden="true">🖼️</div>`}
+            <span class="venue-name">${venue.name}</span>
+          </li>
+        `).join("");
+        recommendationHtml = `
+          <div class="card recommendation-card details-recommendation">
+            <h2 class="card-title">🎒 Travel style for your age</h2>
+            <p class="style-text">${data.recommendation.style}</p>
+            <ul class="venues">${venues}</ul>
+          </div>
+        `;
+      }
+
+      detailsPanel.innerHTML = `
+        <h2 class="card-title">${data.city} <span class="age-badge">from ${data.origin}</span></h2>
+        ${blurbHtml}
+        <dl class="brief-list">${briefRows}</dl>
+        ${recommendationHtml}
+      `;
+    }
+
+    async function loadCityData(cityName) {
+      renderLoading(cityName);
+      try {
+        const response = await fetch(`/city-data/${encodeURIComponent(cityName)}`);
+        const data = await response.json();
+        if (!response.ok) {
+          renderError(data.error || "Something went wrong.");
+          return;
+        }
+        renderCityData(data);
+      } catch (err) {
+        renderError("Network error while fetching travel data.");
+      }
+    }
+
+    CITIES.forEach((city) => {
+      const marker = L.marker([city.lat, city.lon]).addTo(map);
+      marker.bindTooltip(city.name);
+      marker.on("click", () => loadCityData(city.name));
+    });
+  </script>
+</body>
+</html>

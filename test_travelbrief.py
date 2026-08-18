@@ -3,6 +3,8 @@
 import unittest
 from unittest.mock import MagicMock, patch
 
+import requests
+
 from travelbrief import build_brief
 
 GEOCODE_RESULT = {
@@ -72,6 +74,20 @@ class BuildBriefTests(unittest.TestCase):
 
         self.assertIn("1 USD = 1.00 USD", brief)
         self.assertEqual(mock_get.call_count, 2)  # no exchange-rate call needed
+
+    @patch("travelbrief.requests.get")
+    def test_air_quality_error_degrades_gracefully(self, mock_get):
+        mock_get.side_effect = [
+            mock_response(GEOCODE_RESULT),
+            mock_response(FORECAST_RESULT),
+            mock_response(EXCHANGE_RESULT),
+            requests.exceptions.HTTPError("401 Client Error: Unauthorized"),
+        ]
+
+        brief = build_brief("Tokyo", openweather_api_key="badkey")
+
+        self.assertIn("Tokyo, Japan", brief)
+        self.assertIn("Air quality: Unknown", brief)
 
 
 if __name__ == "__main__":

@@ -12,6 +12,7 @@ Example usage:
 import argparse
 import os
 import sys
+import time
 
 import requests
 
@@ -19,6 +20,29 @@ GEOCODING_URL = "https://geocoding-api.open-meteo.com/v1/search"
 FORECAST_URL = "https://api.open-meteo.com/v1/forecast"
 EXCHANGE_URL = "https://api.frankfurter.dev/v1/latest"
 AIR_POLLUTION_URL = "https://api.openweathermap.org/data/2.5/air_pollution"
+
+CACHE_TTL_SECONDS = 10 * 60
+
+# Each cache maps a key -> (value, expiry_timestamp). Weather and air quality
+# are keyed by city name; exchange rates are keyed by (base, target) pair.
+_weather_cache = {}
+_exchange_cache = {}
+_air_quality_cache = {}
+
+
+def _cache_get(cache, key):
+    entry = cache.get(key)
+    if entry is None:
+        return None
+    value, expires_at = entry
+    if time.time() >= expires_at:
+        del cache[key]
+        return None
+    return value
+
+
+def _cache_set(cache, key, value):
+    cache[key] = (value, time.time() + CACHE_TTL_SECONDS)
 
 WMO_WEATHER_CODES = {
     0: "Clear sky",
@@ -136,24 +160,43 @@ def build_brief(city_name, openweather_api_key=None, base_currency="USD"):
     country = place.get("country", "Unknown country")
     country_code = place.get("country_code", "")
 
-    weather = get_current_weather(latitude, longitude, timezone)
+    weather = _cache_get(_weather_cache, city_name)
+    if weather is None:
+        print("Fetching fresh data for", city_name)
+        weather = get_current_weather(latitude, longitude, timezone)
+        _cache_set(_weather_cache, city_name, weather)
+    else:
+        print("Cache hit for", city_name)
     weather_code = weather.get("weather_code")
     weather_desc = WMO_WEATHER_CODES.get(weather_code, WMO_UNKNOWN_CODE_DESC)
 
     currency_code = COUNTRY_TO_CURRENCY.get(country_code)
     exchange_rate = None
     if currency_code and base_currency:
-        try:
-            exchange_rate = get_exchange_rate(currency_code, base_currency=base_currency)
-        except requests.RequestException:
-            exchange_rate = None
+        exchange_key = (base_currency, currency_code)
+        exchange_rate = _cache_get(_exchange_cache, exchange_key)
+        if exchange_rate is None:
+            print("Fetching fresh data for", city_name)
+            try:
+                exchange_rate = get_exchange_rate(currency_code, base_currency=base_currency)
+                _cache_set(_exchange_cache, exchange_key, exchange_rate)
+            except requests.RequestException:
+                exchange_rate = None
+        else:
+            print("Cache hit for", city_name)
 
     aqi = None
     if openweather_api_key:
-        try:
-            aqi = get_air_quality(latitude, longitude, openweather_api_key)
-        except requests.RequestException:
-            aqi = None
+        aqi = _cache_get(_air_quality_cache, city_name)
+        if aqi is None:
+            print("Fetching fresh data for", city_name)
+            try:
+                aqi = get_air_quality(latitude, longitude, openweather_api_key)
+                _cache_set(_air_quality_cache, city_name, aqi)
+            except requests.RequestException:
+                aqi = None
+        else:
+            print("Cache hit for", city_name)
 
     lines = [
         f"Travel Brief: {place['name']}, {country}",

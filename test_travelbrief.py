@@ -1,10 +1,12 @@
 #!/usr/bin/env python3
 """Tests for travelbrief.py. Run with: python3 -m unittest test_travelbrief.py -v"""
+import time
 import unittest
 from unittest.mock import MagicMock, patch
 
 import requests
 
+import travelbrief
 from travelbrief import build_brief
 
 # haversine_km/estimate_fare are defined in app.py (which builds on travelbrief.py's
@@ -37,6 +39,14 @@ def mock_response(payload):
 
 
 class BuildBriefTests(unittest.TestCase):
+    def setUp(self):
+        # The weather/exchange/air-quality caches are module-level, so clear
+        # them before each test to avoid one test's cached response leaking
+        # into another.
+        travelbrief._weather_cache.clear()
+        travelbrief._exchange_cache.clear()
+        travelbrief._air_quality_cache.clear()
+
     @patch("travelbrief.requests.get")
     def test_known_city_includes_weather_and_exchange_rate(self, mock_get):
         mock_get.side_effect = [
@@ -92,6 +102,40 @@ class BuildBriefTests(unittest.TestCase):
 
         self.assertIn("Tokyo, Japan", brief)
         self.assertIn("Air quality: Unknown", brief)
+
+    @patch("travelbrief.requests.get")
+    def test_second_call_for_same_city_reuses_cached_weather_and_exchange_rate(self, mock_get):
+        mock_get.side_effect = [
+            mock_response(GEOCODE_RESULT),
+            mock_response(FORECAST_RESULT),
+            mock_response(EXCHANGE_RESULT),
+            mock_response(GEOCODE_RESULT),  # geocoding isn't cached
+        ]
+
+        first = build_brief("Tokyo")
+        second = build_brief("Tokyo")
+
+        self.assertEqual(first, second)
+        # Only 4 requests total: 2 geocode calls, but weather and exchange
+        # rate are served from cache on the second call instead of 2 more.
+        self.assertEqual(mock_get.call_count, 4)
+
+    @patch("travelbrief.requests.get")
+    def test_expired_cache_entry_triggers_new_request(self, mock_get):
+        mock_get.side_effect = [
+            mock_response(GEOCODE_RESULT),
+            mock_response(FORECAST_RESULT),
+            mock_response(EXCHANGE_RESULT),
+            mock_response(GEOCODE_RESULT),
+            mock_response(FORECAST_RESULT),
+            mock_response(EXCHANGE_RESULT),
+        ]
+
+        build_brief("Tokyo")
+        with patch("travelbrief.time.time", return_value=time.time() + travelbrief.CACHE_TTL_SECONDS + 1):
+            build_brief("Tokyo")
+
+        self.assertEqual(mock_get.call_count, 6)
 
 
 class HaversineKmTests(unittest.TestCase):
